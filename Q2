@@ -1,0 +1,55 @@
+class SalesAndCustomerDatabase:
+    def __init__(self):
+        self.sales_records = []
+        self.customers = {}
+
+    def record_sale(self, customer_id, customer_name, items_purchased, date, total_amount):
+        sale_data = {
+            'customer_id': customer_id,
+            'customer_name': customer_name,
+            'items_purchased': items_purchased,
+            'date': date,
+            'total_amount': total_amount
+        }
+        self.sales_records.append(sale_data)
+        if customer_id in self.customers:
+            self.customers[customer_id]['total_purchases'] += 1
+        else:
+            self.customers[customer_id] = {'name': customer_name, 'total_purchases': 1}
+
+    def calculate_total_sales(self, start_date, end_date):
+        total_sales = 0
+        for record in self.sales_records:
+            if start_date <= record['date'] <= end_date:
+                total_sales += record['total_amount']
+        return total_sales
+
+    def provide_discount(self, customer_id):
+        if customer_id in self.customers and self.customers[customer_id]['total_purchases'] >= 5:
+            return 0.1  # 10% discount for frequent customers
+        return 0
+
+    def generate_report(self):
+        print("Sales Trends:")
+        for record in self.sales_records:
+            print(f"Date: {record['date']}, Customer: {record['customer_name']}, Total Amount: {record['total_amount']}")
+
+        print("\nTop Customers:")
+        top_customers = sorted(self.customers.values(), key=lambda x: x['total_purchases'], reverse=True)[:5]
+        for i, customer in enumerate(top_customers):
+            print(f"{i + 1}. Name: {customer['name']}, Total Purchases: {customer['total_purchases']}")
+
+# Usage example
+sales_db = SalesAndCustomerDatabase()
+
+sales_db.record_sale(1, 'John', ['Item1', 'Item2', 'Item3'], '2023-10-17', 150)
+sales_db.record_sale(2, 'Alice', ['Item2', 'Item3', 'Item4'], '2023-10-18', 200)
+total_sales = sales_db.calculate_total_sales('2023-10-17', '2023-10-18')
+
+discount = sales_db.provide_discount(1)
+if discount > 0:
+    print("Discount provided!")
+else:
+    print("No discount provided.")
+
+sales_db.generate_report()
